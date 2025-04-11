@@ -19,7 +19,17 @@ class BlogController extends Controller
 
     public function index()
     {
-        $blogs = $this->blogRepository->getAll();
+        $blogs = $this->blogRepository->search();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $blogs
+        ]);
+    }
+
+    public function forYou()
+    {
+        $blogs = $this->blogRepository->forYou();
 
         return response()->json([
             'status' => 'success',

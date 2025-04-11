@@ -8,11 +8,13 @@ interface BlogRepositoryInterface
 {
     public function getAll(): Collection;
 
-    public function search(): Array;
+    public function search();
 
     public function getById(int $id);
 
     public function getBySlug(string $slug);
+
+    public function forYou();
 
     public function create(array $data);
 
@@ -21,4 +23,7 @@ interface BlogRepositoryInterface
     public function delete(int $id): bool;
 
     public function updateStatus(int $id, string $status);
+
+    public function slugGenerator(string $title);
+
 }

@@ -20,7 +20,7 @@ class BlogRepository implements BlogRepositoryInterface
         return $this->model->all();
     }
 
-    public function search(): Array
+    public function forYou(): Array
     {
         $page = request()->input('page', 1);
         $perPage = request()->input('perPage', 10);
@@ -29,13 +29,37 @@ class BlogRepository implements BlogRepositoryInterface
         $search = request()->input('search', '');
 
         $query = $this->model->query();
+       
         if ($search) {
             $query->where('title', 'like', '%' . $search . '%')
                 ->orWhere('content', 'like', '%' . $search . '%');
         }
 
-        return $query->orderBy($sortBy, $descending ? 'desc' : 'asc')
-            ->paginate($perPage, ['*'], 'page', $page); 
+        $query->where('status', 'published');
+
+        return $query->with('user')->orderBy($sortBy, $descending ? 'desc' : 'asc')
+            ->paginate($perPage, ['*'], 'page', $page)->toArray();
+    }
+
+    public function search(): Array
+    {
+        $page = request()->input('page', 1);
+        $perPage = request()->input('perPage', 10);
+        $sortBy = request()->input('sortBy', 'created_at');
+        $descending = request()->input('descending', true);
+        $search = request()->input('search', '');
+
+        //current user id
+        $currentUserId = Auth::id();
+        $query = $this->model->where('created_by', $currentUserId);
+
+        if ($search) {
+            $query->where('title', 'like', '%' . $search . '%')
+                ->orWhere('content', 'like', '%' . $search . '%');
+        }
+
+        return $query->with('user')->orderBy($sortBy, $descending ? 'desc' : 'asc')
+            ->paginate($perPage, ['*'], 'page', $page)->toArray();
     }
 
     public function getById(int $id)
@@ -51,8 +75,20 @@ class BlogRepository implements BlogRepositoryInterface
      */
     public function getBySlug(string $slug)
     {
-        $slug = str_replace('-', ' ', $slug);
-        return $this->model->where('title', $slug)->first();
+        return $this->model->where('slug', $slug)->first();
+    }
+
+    public function slugGenerator(string $title)
+    {
+        //remove all special characters
+        $slug = preg_replace('/[^a-zA-Z0-9\s]/', '', $title);
+        //replace spaces with hyphens
+        $slug = str_replace(' ', '-', $slug);
+        //convert to lowercase
+        $slug = strtolower($slug);
+        //remove trailing hyphens
+        $slug = rtrim($slug, '-');
+        return $slug;
     }
 
     public function create(array $data)
@@ -61,6 +97,18 @@ class BlogRepository implements BlogRepositoryInterface
         if ($this->model->where('title', $data['title'])->exists()) {
             throw new \Exception('Title must be unique');
         }
+        
+
+        if (isset($data['image']) && $data['image']) {
+            $data['image'] = $data['image']->store('blogs', 'public');
+        }
+
+        $data['slug'] = $this->slugGenerator($data['title']);
+
+        if ($this->model->where('slug', $data['slug'])->exists()) {
+            $data['slug'] = $data['slug'] . '-' . uniqid();
+        }
+
         $data['created_by'] = Auth::id();
         return $this->model->create($data);
     }
@@ -71,11 +119,22 @@ class BlogRepository implements BlogRepositoryInterface
         $blog->status = $status;
         $blog->save();
         return $blog;
+
     }
 
     public function update(int $id, array $data)
     {
         $blog = $this->getById($id);
+        $data['slug'] = $this->slugGenerator($data['title']);
+
+        if (isset($data['image']) && $data['image'] != null) {
+            $data['image'] = $data['image']->store('blogs', 'public');
+        }
+
+        if ($this->model->where('slug', $data['slug'])->exists() && $this->model->where('id', '!=', $id)->first()) {
+            $data['slug'] = $data['slug'] . '-' . uniqid();
+        }
+
         $blog->update($data);
         return $blog;
     }

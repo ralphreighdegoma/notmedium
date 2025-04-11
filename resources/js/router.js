@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from './pages/LoginPage.vue';
+import RegisterPage from './pages/RegisterPage.vue';
+import Blogs from './pages/Blogs.vue';
 import BlogPage from './pages/BlogPage.vue'; // Placeholder for your blog page
 import BlogsPage from './pages/dashboard/BlogsPage.vue'; // Import the blog management page
 import BlogPreviewPage from './pages/BlogPreviewPage.vue'; // Import the blog preview page
@@ -13,10 +15,15 @@ const routes = [
     meta: { requiresGuest: true } // Only accessible if not logged in
   },
   {
-    path: '/blog',
+    path: '/register',
+    name: 'Register',
+    component: RegisterPage,
+    meta: { requiresGuest: true } // Only accessible if not logged in
+  },
+  {
+    path: '/blogs',
     name: 'Blog',
-    component: BlogPage,
-    meta: { requiresAuth: true } // Requires authentication
+    component: Blogs
   },
   {
     path: '/dashboard/blogs',
@@ -26,7 +33,7 @@ const routes = [
   },
   // Blog preview route
   {
-    path: '/blog/:slug/preview',
+    path: '/blogs/:slug',
     name: 'BlogPreview',
     component: BlogPreviewPage,
     meta: { requiresAuth: true } // Requires authentication
@@ -36,7 +43,7 @@ const routes = [
     path: '/',
     redirect: () => {
       const authStore = useAuthStore();
-      return authStore.isAuthenticated ? '/blog' : '/login';
+      return authStore.isAuthenticated ? '/dashboard/blogs' : '/login';
     }
   },
   // Add other routes here
@@ -58,7 +65,7 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login' });
   } else if (requiresGuest && authStore.isAuthenticated) {
     // Redirect to blog page if trying to access login page while already authenticated
-    next({ name: 'Blog' });
+    next({ name: 'BlogManagement' });
   } else {
     // Proceed as normal
     next();

@@ -4,33 +4,46 @@
     <div class="col-12 col-md-6 flex flex-center" v-if="$q.screen.gt.sm">
       <q-img
         src="/images/login.jpg"
-        alt="Login image"
+        alt="Register image"
         fit="cover"
         spinner-color="white"
         spinner-size="50px"
-        class="login-side-image"
+        class="register-side-image"
         style="margin: auto; transform: scale(0.79)"
       >
       </q-img>
     </div>
 
-    <!-- Right column with login form -->
+    <!-- Right column with registration form -->
     <div class="col-12 col-md-6 flex flex-center q-pa-md q-pa-lg-xl">
       <div class="q-pa-md" style="width: 100%; max-width: 400px;">
-        <!-- Small logo for mobile only -->
-     
-        
         <h4 class="text-h4 q-mb-md text-weight-bold text-center">NotMedium Blog</h4>
-        <p class="text-subtitle1 q-mb-lg text-grey-8 text-center">Please sign in to continue</p>
+        <p class="text-subtitle1 q-mb-lg text-grey-8 text-center">Create your account</p>
 
-        <q-form @submit.prevent="handleLogin" class="q-gutter-y-md">
+        <q-form @submit.prevent="handleRegister" class="q-gutter-y-md">
+          <q-input
+            filled
+            v-model="name"
+            label="Full Name"
+            type="text"
+            lazy-rules
+            :rules="[ val => val && val.length > 0 || 'Please enter your name']"
+          >
+            <template v-slot:prepend>
+              <q-icon name="person" />
+            </template>
+          </q-input>
+
           <q-input
             filled
             v-model="email"
             label="Email"
             type="email"
             lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please enter your email']"
+            :rules="[ 
+              val => val && val.length > 0 || 'Please enter your email',
+              val => /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(val) || 'Please enter a valid email'
+            ]"
           >
             <template v-slot:prepend>
               <q-icon name="email" />
@@ -43,7 +56,23 @@
             v-model="password"
             label="Password"
             lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please enter your password']"
+            :rules="[ val => val && val.length >= 8 || 'Password must be at least 8 characters']"
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" />
+            </template>
+          </q-input>
+
+          <q-input
+            filled
+            type="password"
+            v-model="passwordConfirmation"
+            label="Confirm Password"
+            lazy-rules
+            :rules="[ 
+              val => val && val.length > 0 || 'Please confirm your password',
+              val => val === password || 'Passwords do not match'
+            ]"
           >
             <template v-slot:prepend>
               <q-icon name="lock" />
@@ -54,13 +83,8 @@
             {{ errorMessage }}
           </q-banner>
 
-          <div class="flex justify-between items-center q-mt-md">
-            <q-checkbox dense v-model="rememberMe" label="Remember me" />
-            <a href="#" class="text-primary">Forgot password?</a>
-          </div>
-
           <q-btn 
-            label="Sign In" 
+            label="Sign Up" 
             type="submit" 
             color="primary" 
             class="full-width q-py-sm q-mt-md" 
@@ -70,8 +94,8 @@
         </q-form>
         
         <div class="q-mt-xl text-center text-grey-8">
-          Don't have an account? 
-          <router-link to="/register" class="text-primary text-weight-bold">Sign up</router-link>
+          Already have an account? 
+          <router-link to="/login" class="text-primary text-weight-bold">Sign in</router-link>
         </div>
       </div>
     </div>
@@ -87,20 +111,22 @@ import { useAuthStore } from '../stores/auth.js';
 const router = useRouter();
 const authStore = useAuthStore();
 
+const name = ref('');
 const email = ref('');
 const password = ref('');
+const passwordConfirmation = ref('');
 const loading = ref(false);
 const errorMessage = ref('');
-const rememberMe = ref(false);
 
-const handleLogin = async () => {
+const handleRegister = async () => {
   loading.value = true;
   errorMessage.value = '';
   try {
-    const response = await axios.post('/api/login', {
+    const response = await axios.post('/api/register', {
+      name: name.value,
       email: email.value,
       password: password.value,
-      remember: rememberMe.value
+      password_confirmation: passwordConfirmation.value
     });
     
     const token = response.data.token;
@@ -112,13 +138,21 @@ const handleLogin = async () => {
     
     router.push('/dashboard/blogs');
   } catch (error) {
-    console.error('Login failed:', error);
+    console.error('Registration failed:', error);
     if (error.response && error.response.status === 422) {
-      errorMessage.value = error.response.data.message || 'Invalid credentials.';
+      const validationErrors = error.response.data.errors;
+      if (validationErrors) {
+        // Format validation errors
+        errorMessage.value = Object.values(validationErrors)
+          .flat()
+          .join(', ');
+      } else {
+        errorMessage.value = error.response.data.message || 'Validation failed.';
+      }
     } else if (error.response) {
-       errorMessage.value = `Login failed: ${error.response.data.message || 'Server error'}`;
+       errorMessage.value = `Registration failed: ${error.response.data.message || 'Server error'}`;
     } else {
-      errorMessage.value = 'Login failed. Please check your connection.';
+      errorMessage.value = 'Registration failed. Please check your connection.';
     }
   } finally {
     loading.value = false;
@@ -127,7 +161,7 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-.login-side-image {
+.register-side-image {
   width: 100%;
   height: 100vh;
 }

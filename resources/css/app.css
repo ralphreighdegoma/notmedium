@@ -9,3 +9,37 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+}
+
+
+.q-field--filled .q-field__control {
+    border-radius: 0px !important;
+    background-color: #fff !important;
+    border: 1px solid #375F7D !important;
+
+}
+
+.q-field--outlined .q-field__control:before {
+    border: 3px solid #375F7D !important;
+}
+
+.q-field__native, .q-field__input {
+    height: 50px !important;
+}
+
+.page-container-blog {
+    margin: 0 auto;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+

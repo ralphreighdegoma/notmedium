@@ -1,13 +1,11 @@
 <template>
     <q-layout view="lHh Lpr lFf">
-      <q-header elevated>
-        <q-toolbar>
-          <q-toolbar-title>BlogQua</q-toolbar-title>
-          <q-btn v-if="authStore.isAuthenticated" flat label="Logout" @click="handleLogout" />
-        </q-toolbar>
-      </q-header>
+      <Sidebar 
+        v-if="authStore.isAuthenticated"
+        v-model="leftDrawerOpen" 
+      />
   
-      <q-page-container>
+      <q-page-container class="page-container-blog">
         <router-view />
       </q-page-container>
     </q-layout>
@@ -15,10 +13,10 @@
   
   <script setup>
   import { useAuthStore } from './stores/auth';
+  import { ref } from 'vue';
+  import Sidebar from './components/Sidebar.vue';
+  
 
   const authStore = useAuthStore();
-
-  const handleLogout = () => {
-    authStore.logout();
-  };
+  const leftDrawerOpen = ref(true);
   </script>

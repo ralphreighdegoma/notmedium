@@ -15,10 +15,9 @@
 
     <div v-else class="blog-preview">
       <!-- Hero Section with Featured Image -->
-      <div class="blog-hero" :style="blog.featured_image ? `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${blog.featured_image})` : 'background-color: var(--q-primary)'">
+      <div class="blog-hero" :style="blog.image_preview ? `background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url(${blog.image_preview})` : 'background-color: #6c6c6c'">
         <div class="container q-pa-md">
           <div class="row justify-between items-center q-mb-md">
-            <q-chip color="primary" text-color="white" icon="visibility">Preview Mode</q-chip>
             <q-btn 
               color="white" 
               flat
@@ -196,14 +195,12 @@ onMounted(() => {
 
 .blog-body blockquote {
   border-left: 4px solid var(--q-primary);
-  padding-left: 1.5rem;
   font-style: italic;
   margin: 2rem 0;
   color: #555;
 }
 
 .blog-body ul, .blog-body ol {
-  padding-left: 1.5rem;
   margin-bottom: 1.5rem;
 }
 

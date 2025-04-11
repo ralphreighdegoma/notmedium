@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
@@ -34,6 +35,13 @@ class AuthController extends Controller
 
         $token = $user->createToken('authToken')->accessToken;
 
+        return response()->json(['token' => $token]);
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        $user = User::create($request->validated());
+        $token = $user->createToken('authToken')->accessToken;
         return response()->json(['token' => $token]);
     }
 
