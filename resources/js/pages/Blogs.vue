@@ -30,7 +30,7 @@
         <div class="text-subtitle1 text-grey-6">Try a different search term or check back later</div>
       </div>
 
-      <div v-else class="col-12 col-sm-10 col-md-8">
+      <div v-else class="col-12 col-sm-10 col-md-6">
         <q-list bordered separator>
           <q-item 
             v-for="blog in blogs" 
@@ -44,7 +44,7 @@
               <div class="row items-start no-wrap">
                 <div class="col-grow">
                   <q-item-label class="text-h6" style="width: 300px;">{{ blog.title }}</q-item-label>
-                  <q-item-label caption lines="2" class="q-mt-sm blog-preview-text" style="width: 300px;">
+                  <q-item-label caption lines="2" class="q-mt-sm blog-preview-text" style="width: 400px;">
                     {{ truncateContent(blog.content) }}
                   </q-item-label>
                   <div class="row q-mt-sm text-grey-7 items-center">
@@ -61,8 +61,8 @@
                   <q-img
                     :src="blog.image_preview"
                     :ratio="1"
-                    width="80px"
-                    height="80px"
+                    width="200px"
+                    height="100px"
                     class="rounded-borders blog-thumbnail"
                     contain
                   />
@@ -212,8 +212,7 @@ onMounted(() => {
   }
   
   .q-page {
-    height: auto;
-    min-height: 100vh;
+    min-height: 100%;
     overflow-y: auto;
   }
 }

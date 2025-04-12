@@ -4,7 +4,6 @@
     v-if="!mobileScreen"
     v-model="drawerOpen"
     show-if-above
-    bordered
     :width="100"
     :breakpoint="500"
     class="flex flex-center"
