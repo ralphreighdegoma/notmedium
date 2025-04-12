@@ -53,8 +53,10 @@
                     <q-separator vertical spaced="sm" class="q-mx-sm" />
                     <q-icon name="person" size="xs" class="q-mr-xs" />
                     <span class="text-caption">{{ blog.user ? blog.user.name : 'Unknown' }}</span>
+                    <q-separator vertical spaced="sm" class="q-mx-sm" />
+                    <q-icon name="schedule" size="xs" class="q-mr-xs" />
+                    <span class="text-caption">{{ blog.read_time }} min read</span>
                     <q-space />
-                 
                   </div>
                 </div>
                 <div class="col-auto q-ml-md" v-if="blog.image_preview">

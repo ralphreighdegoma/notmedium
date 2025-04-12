@@ -75,7 +75,7 @@ class BlogRepository implements BlogRepositoryInterface
      */
     public function getBySlug(string $slug)
     {
-        return $this->model->where('slug', $slug)->first();
+        return $this->model->with('user')->where('slug', $slug)->first();
     }
 
     public function slugGenerator(string $title)

@@ -1,7 +1,6 @@
 <template>
     <q-layout view="lHh Lpr lFf">
       <Sidebar 
-        v-if="authStore.isAuthenticated"
         v-model="leftDrawerOpen" 
       />
   

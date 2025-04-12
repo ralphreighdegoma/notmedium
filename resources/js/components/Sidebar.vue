@@ -9,30 +9,41 @@
     class="flex flex-center"
   >
     <q-list class="text-center">
-        <q-item clickable @click="handleForYouBlogs" class="justify-center">
+        <q-item clickable @click="handleForYouBlogs" class="justify-center" :class="{ 'bg-grey-3': $route.path === '/blogs' }">
             <q-item-section avatar>
-                <q-icon name="person" size="sm" />
+                <q-icon name="description" size="sm" />
             </q-item-section>
+        </q-item>
+        <q-item v-if="!authStore.isAuthenticated" clickable @click="handleLogin" class="justify-center" :class="{ 'bg-grey-3': $route.path === '/login' }">
+            <q-item-section avatar>
+                <q-icon name="lock" size="sm" />
+            </q-item-section>
+        </q-item>
+
+        <template v-if="authStore.isAuthenticated">
+            <q-item clickable @click="handleBlogsManagement" class="justify-center" :class="{ 'bg-grey-3': $route.path === '/dashboard/blogs' }">
+                <q-item-section avatar>
+                <q-icon name="settings" size="sm" />
+                </q-item-section>
             </q-item>
-        <q-item clickable @click="handleBlogsManagement" class="justify-center">
-            <q-item-section avatar>
-            <q-icon name="description" size="sm" />
-            </q-item-section>
-        </q-item>
-        <q-item clickable @click="handleLogout" class="justify-center">
-            <q-item-section avatar>
-            <q-icon name="logout" size="sm" />
-            </q-item-section>
-        </q-item>
+            <q-item v-if="authStore.isAuthenticated" clickable @click="handleLogout" class="justify-center">
+                <q-item-section avatar>
+                <q-icon name="logout" size="sm" />
+                </q-item-section>
+            </q-item>
+        </template>
     </q-list>
   </q-drawer>
 
   <!-- Mobile Bottom Navigation -->
   <q-footer v-if="mobileScreen" bordered class="bg-white text-primary">
     <q-tabs no-caps align="justify" class="text-primary">
-      <q-tab @click="handleForYouBlogs" icon="person" />
-      <q-tab @click="handleBlogsManagement" icon="person" />
-      <q-tab @click="handleLogout" icon="logout" />
+      <q-tab @click="handleForYouBlogs" icon="description" :class="{ 'bg-grey-3': $route.path === '/blogs' }" />
+      <q-tab v-if="!authStore.isAuthenticated" @click="handleLogin" icon="lock" :class="{ 'bg-grey-3': $route.path === '/login' }" />
+      <template v-if="authStore.isAuthenticated">
+        <q-tab @click="handleBlogsManagement" icon="settings" :class="{ 'bg-grey-3': $route.path === '/dashboard/blogs' }" />
+        <q-tab @click="handleLogout" icon="logout" />
+      </template>
     </q-tabs>
   </q-footer>
 </template>
@@ -62,6 +73,10 @@ const drawerOpen = computed({
 
 const handleLogout = () => {
   authStore.logout();
+};
+
+const handleLogin = () => {
+  router.push('/login');
 };
 
 const handleBlogsManagement = () => {

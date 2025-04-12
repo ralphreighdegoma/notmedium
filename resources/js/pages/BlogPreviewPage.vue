@@ -35,7 +35,11 @@
               <q-icon name="event" size="sm" class="q-mr-xs" />
               <span>{{ formatDate(blog.created_at || new Date()) }}</span>
             </div>
-            <div class="row items-center" v-if="blog.author">
+            <div class="row items-center" v-if="blog.user?.name">
+              <q-icon name="person" size="sm" class="q-mr-xs" />
+              <span>{{ blog.user.name }}</span>
+            </div>
+            <div class="row items-center" v-else-if="blog.author">
               <q-icon name="person" size="sm" class="q-mr-xs" />
               <span>{{ blog.author }}</span>
             </div>
@@ -109,7 +113,8 @@ const fetchBlog = async () => {
 
 // Navigate back to the dashboard
 const goBack = () => {
-  router.push('/dashboard/blogs');
+    //back to last page
+    router.back();
 };
 
 onMounted(() => {

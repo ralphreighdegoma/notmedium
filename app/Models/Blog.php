@@ -12,7 +12,7 @@ class Blog extends Model
 
     //
     protected $fillable = ['title', 'content', 'status', 'created_by', 'slug', 'image', 'slug',  'created_at', 'updated_at'];
-    protected $appends = ['image_preview'];
+    protected $appends = ['image_preview', 'read_time'];
 
 
     public function getImagePreviewAttribute()
@@ -29,6 +29,12 @@ class Blog extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function getReadTimeAttribute()
+    {
+        $minutes = floor(str_word_count($this->content) / 150);
+        return $minutes;
     }
 
 

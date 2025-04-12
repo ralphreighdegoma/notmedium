@@ -1,17 +1,19 @@
 <template>
   <q-page padding>
-    <div class="q-pa-md">
+    <div class="q-pa-sm q-pa-md-md">
       <div class="row q-mb-md items-center justify-between">
-        <div class="text-h5">Blog Management</div>
+        <div class="text-h6 text-h5-md">Blog Management</div>
         <q-btn 
-          label="Add New Blog" 
+          label="Add Blog"
+          class="q-px-sm"
+          :label-class="$q.screen.gt.xs ? '' : 'hidden'" 
           color="primary" 
           icon="add"
           @click="addNewBlog()"
         />
       </div>
       
-      <div class="q-mb-md" style="width: 300px">
+      <div class="q-mb-md full-width" :style="$q.screen.gt.xs ? 'width: 300px' : ''">
         <q-input
           v-model="searchQuery"
           filled
@@ -19,6 +21,7 @@
           class="q-mb-md"
           @update:model-value="onSearch"
           clearable
+          dense
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -34,25 +37,29 @@
         :pagination="pagination"
         @request="onRequest"
         binary-state-sort
+        :table-style="{ width: '100%' }"
+        :grid="$q.screen.lt.sm"
       >
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td key="image" :props="props">
-              <q-img :src="props.row.image_preview" style="width: 100px; height: 40px;" />
+              <q-img :src="props.row.image_preview" :style="$q.screen.gt.xs ? 'width: 100px; height: 40px;' : 'width: 80px; height: 32px;'" />
             </q-td>
             <q-td key="title" :props="props">
-              {{ props.row.title }}
+              <div class="ellipsis" :style="$q.screen.gt.xs ? 'max-width: 300px' : 'max-width: 150px'">
+                {{ props.row.title }}
+              </div>
             </q-td>
             <q-td key="status" :props="props">
-              <q-badge style="font-size: 12px; padding: 5px 10px;" :color="props.row.status === 'published' ? 'green' : 'grey'">
+              <q-badge :style="$q.screen.gt.xs ? 'font-size: 12px; padding: 5px 10px;' : 'font-size: 10px; padding: 3px 8px;'" :color="props.row.status === 'published' ? 'green' : 'grey'">
                 {{ props.row.status === 'published' ? 'Published' : 'Draft' }}
               </q-badge>
             </q-td>
-            <q-td key="created_at" :props="props">
+            <q-td key="created_at" :props="props" :class="$q.screen.lt.sm ? 'hidden' : ''">
               {{ formatDate(props.row.created_at) }}
             </q-td>
             <q-td key="actions" :props="props">
-              <q-btn-dropdown flat dense color="primary" label="Actions">
+              <q-btn-dropdown flat dense color="primary" :label="$q.screen.gt.xs ? 'Actions' : undefined" icon="more_vert">
                 <q-list>
                   <q-item clickable v-close-popup @click="editBlog(props.row)">
                     <q-item-section avatar>
@@ -90,14 +97,14 @@
         </template>
 
         <template v-slot:no-data>
-          <div class="full-width row flex-center q-pa-md text-grey-8">
-            <q-icon name="sentiment_dissatisfied" size="24px" class="q-mr-md" />
+          <div class="full-width row flex-center q-pa-md text-grey-8 text-center">
+            <q-icon name="sentiment_dissatisfied" size="24px" class="q-mb-sm" />
             <span>No blogs found | Time to create your first blog.</span>
           </div>
         </template>
       </q-table>
 
-      <q-dialog v-model="showBlogModal" persistent position="right">
+      <q-dialog v-model="showBlogModal" persistent :position="$q.screen.gt.sm ? 'right' : 'standard'" :full-height="$q.screen.lt.md">
         <blog-form-modal 
           :blog="selectedBlog" 
           @close="closeBlogModal" 
@@ -107,13 +114,13 @@
       </q-dialog>
 
       <q-dialog v-model="showArchiveDialog">
-        <q-card>
+        <q-card style="min-width: 300px">
           <q-card-section class="row items-center">
             <q-avatar icon="archive" color="negative" text-color="white" />
             <span class="q-ml-sm">Are you sure you want to archive this blog?</span>
           </q-card-section>
 
-          <q-card-actions align="right">
+          <q-card-actions align="right" class="q-pa-md">
             <q-btn flat label="Cancel" color="primary" v-close-popup />
             <q-btn flat label="Archive" color="negative" @click="archiveBlog" v-close-popup />
           </q-card-actions>

@@ -36,12 +36,13 @@ const routes = [
     path: '/blogs/:slug',
     name: 'BlogPreview',
     component: BlogPreviewPage,
-    meta: { requiresAuth: true } // Requires authentication
+    meta: { requiresAuth: false } // Requires authentication
   },
   // Redirect root path to blog if authenticated, otherwise to login
   {
     path: '/',
     redirect: () => {
+      return '/blogs';
       const authStore = useAuthStore();
       return authStore.isAuthenticated ? '/dashboard/blogs' : '/login';
     }

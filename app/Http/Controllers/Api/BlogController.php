@@ -78,6 +78,7 @@ class BlogController extends Controller
             'message' => 'Blog deleted successfully'
         ]);
     }
+    
 
     /**
      * Preview a blog by slug
