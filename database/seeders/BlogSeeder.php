@@ -15,6 +15,13 @@ class BlogSeeder extends Seeder
      */
     public function run(): void
     {
+
+        //check if user table is empty
+        if (\App\Models\User::count() === 0) {
+            $this->command->error('User table is empty. Please Register User First.');
+            return;
+        }
+
         $feedUrl = 'https://feeds.simplecast.com/54nAGcIl';
         $response = Http::get($feedUrl);
 
@@ -70,6 +77,9 @@ class BlogSeeder extends Seeder
         if (Blog::where('slug', $slug)->exists()) {
             $slug = $slug . '-' . uniqid();
         }
+        
+        //random user id from users table
+        $randomUser = \App\Models\User::inRandomOrder()->first();
 
         // Create the blog post
         Blog::create([
@@ -77,7 +87,7 @@ class BlogSeeder extends Seeder
             'content' => $this->cleanContent($content),
             'status' => 'published',
             'slug' => $slug,
-            'created_by' => 1, // or use a specific user ID
+            'created_by' => $randomUser->id,
             'image' => $imagePath,
             'created_at' => date('Y-m-d H:i:s', strtotime((string)$item->pubDate)),
             'updated_at' => date('Y-m-d H:i:s', strtotime((string)$item->pubDate)),

@@ -4,12 +4,14 @@
       <div class="col-12 col-md-8">
         <div class="row q-mb-md items-center justify-between">
           <div class="text-h6 text-h5-md">Blog Management</div>
-          <q-btn 
+          <q-btn
             label="Add Blog"
-            class="q-px-sm"
-            :label-class="$q.screen.gt.xs ? '' : 'hidden'" 
-            color="primary" 
+            class="q-px-sm q-py-xs"
+            :label-class="$q.screen.gt.xs ? 'q-ml-sm' : 'hidden'"
+            color="primary"
             icon="add"
+            size="md"
+            unelevated
             @click="addNewBlog()"
           />
         </div>
@@ -74,7 +76,7 @@
                       <q-item-section>Preview</q-item-section>
                     </q-item>
 
-                    <q-item clickable v-close-popup @click="toggleStatus(props.row)">
+                    <q-item clickable v-close-popup @click="confirmStatusChange(props.row)">
                       <q-item-section avatar>
                         <q-icon :name="props.row.status === 'published' ? 'unpublished' : 'publish'" :color="props.row.status === 'published' ? 'grey' : 'green'" />
                       </q-item-section>
@@ -125,6 +127,20 @@
             </q-card-actions>
           </q-card>
         </q-dialog>
+
+        <q-dialog v-model="showStatusDialog">
+          <q-card style="min-width: 300px">
+            <q-card-section class="row items-center">
+              <q-avatar :icon="selectedBlog?.status === 'published' ? 'unpublished' : 'publish'" :color="selectedBlog?.status === 'published' ? 'grey' : 'green'" text-color="white" />
+              <span class="q-ml-sm">Are you sure you want to {{ selectedBlog?.status === 'published' ? 'unpublish' : 'publish' }} this blog?</span>
+            </q-card-section>
+
+            <q-card-actions align="right" class="q-pa-md">
+              <q-btn flat label="Cancel" color="primary" v-close-popup />
+              <q-btn flat :label="selectedBlog?.status === 'published' ? 'Unpublish' : 'Publish'" :color="selectedBlog?.status === 'published' ? 'grey' : 'green'" @click="toggleStatus" v-close-popup />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
       </div>
     </div>
   </q-page>
@@ -158,6 +174,7 @@ const pagination = ref({
 const showBlogModal = ref(false);
 const selectedBlog = ref(null);
 const showArchiveDialog = ref(false);
+const showStatusDialog = ref(false);
 
 const formatDate = (dateString) => {
   return date.formatDate(dateString, 'YYYY-MM-DD HH:mm');
@@ -210,10 +227,15 @@ const editBlog = (blog) => {
   showBlogModal.value = true;
 };
 
-const toggleStatus = async (blog) => {
+const confirmStatusChange = (blog) => {
+  selectedBlog.value = blog;
+  showStatusDialog.value = true;
+};
+
+const toggleStatus = async () => {
   try {
-    const newStatus = blog.status === 'published' ? 'draft' : 'published';
-    await axios.patch(`/api/blogs/${blog.id}/status`, {
+    const newStatus = selectedBlog.value.status === 'published' ? 'draft' : 'published';
+    await axios.patch(`/api/blogs/${selectedBlog.value.id}/status`, {
       status: newStatus
     });
     fetchBlogs();

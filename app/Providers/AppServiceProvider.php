@@ -12,7 +12,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        Passport::ignoreRoutes();
+        
     }
 
     /**
@@ -21,5 +21,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Passport::loadKeysFrom(base_path('secrets/oauth'));
+        Passport::ignoreRoutes();
     }
 }
